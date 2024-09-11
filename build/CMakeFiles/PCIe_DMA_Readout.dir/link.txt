@@ -1,1 +1,0 @@
-/usr/bin/c++ CMakeFiles/PCIe_DMA_Readout.dir/source/main.cpp.o -o ../bin/PCIe_DMA_Readout  libxdma_device.a 

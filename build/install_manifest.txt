@@ -1,2 +1,0 @@
-/usr/local/bin/PCIe_DMA_Readout
-/usr/local/lib/libxdma_device.a
