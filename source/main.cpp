@@ -1,29 +1,57 @@
 #include "xdma_device.h"
 #include <iostream>
+#include <vector>
+#include <chrono>
+#include <cstdlib> // for std::exit
 
 int main(int argc, char* argv[]) {
-    if (argc != 4) {
-        std::cerr << "Usage: " << argv[0] << " <device> <address> <size>\n";
+    if (argc != 6) { // Correct argument count check
+        std::cerr << "Usage: " << argv[0] << " <read_device> <write_device> <control_device> <address> <size>\n";
         return EXIT_FAILURE;
     }
 
-    std::string device = argv[1];
-    uint32_t address = std::stoul(argv[2], nullptr, 0);
-    size_t size = std::stoul(argv[3], nullptr, 0);
+    std::string readDevicePath = argv[1];
+    std::string writeDevicePath = argv[2];
+    std::string controlDevicePath = argv[3];
+    uint32_t address = std::stoul(argv[4], nullptr, 0); // Convert address
+    size_t size = std::stoul(argv[5], nullptr, 0); // Convert size
 
     // Create the XDMADevice object
-    XDMADevice xdmaDevice(device);
+    XDMADevice xdmaDevice(readDevicePath, writeDevicePath, controlDevicePath);
 
-    // Initialize the device (open the device)
+    // Initialize the device
     if (!xdmaDevice.initialize()) {
+        std::cerr << "Failed to initialize the device.\n";
+        return EXIT_FAILURE;
+    }
+
+    // Generate test data
+    std::vector<char> testData(size, 0xAC);  // Example data, fill with 0xAB
+
+    // Write to the device
+    auto start = std::chrono::high_resolution_clock::now();
+    if (xdmaDevice.writeToDevice(address, size, testData.data())) {
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed = end - start;
+        std::cout << "Write operation successful. Time taken: " << elapsed.count() << " seconds.\n";
+        xdmaDevice.printWriteTransferSpeed();
+    } else {
+        std::cerr << "Failed to write to the device.\n";
         return EXIT_FAILURE;
     }
 
     // Read from the device
-    ssize_t bytes = xdmaDevice.readFromDevice(address, size);
-    if (bytes > 0) {
-        xdmaDevice.printTransferSpeed();
-        xdmaDevice.printHexDump(size);
+    start = std::chrono::high_resolution_clock::now();
+    ssize_t bytesRead = xdmaDevice.readFromDevice(address, size);
+    if (bytesRead >= 0) {
+        auto end = std::chrono::high_resolution_clock::now();
+        std::chrono::duration<double> elapsed = end - start;
+        std::cout << "Read operation successful, " << bytesRead << " bytes read. Time taken: " << elapsed.count() << " seconds.\n";
+        xdmaDevice.printReadHexDump(size);
+        xdmaDevice.printReadTransferSpeed();
+    } else {
+        std::cerr << "Failed to read from the device.\n";
+        return EXIT_FAILURE;
     }
 
     return EXIT_SUCCESS;

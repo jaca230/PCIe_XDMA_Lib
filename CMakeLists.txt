@@ -36,6 +36,10 @@ set_target_properties(PCIe_DMA_Readout PROPERTIES
 # Link the library to the executable
 target_link_libraries(PCIe_DMA_Readout xdma_device)
 
+# Find and link pthread
+find_package(Threads REQUIRED)
+target_link_libraries(PCIe_DMA_Readout ${CMAKE_THREAD_LIBS_INIT})
+
 # Custom command to create output directories if they do not exist
 add_custom_target(create_output_dirs
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_ARCHIVE_OUTPUT_DIRECTORY}

@@ -1,29 +1,28 @@
 #ifndef XDMA_DEVICE_H
 #define XDMA_DEVICE_H
 
-#include <string>
-#include <vector>
-#include <chrono>
+#include "xdma_device_read.h"
+#include "xdma_device_write.h"
+#include "xdma_device_control.h"
 
 class XDMADevice {
 public:
-    XDMADevice(const std::string& device);
+    XDMADevice(const std::string& readDevice, const std::string& writeDevice, const std::string& controlDevice);
     ~XDMADevice();
 
-    bool initialize();  // Initialize the device (open it)
-    ssize_t readFromDevice(uint32_t address, size_t size);  // Read from the device at a specific address
-    void printTransferSpeed() const;  // Print transfer speed for the last read
-    void printHexDump(size_t size) const;  // Print the hex dump of the read buffer (up to `size` bytes)
+    bool initialize();  // Initialize all devices
+    ssize_t readFromDevice(uint32_t address, size_t size);  // Read from the read device
+    bool writeToDevice(uint32_t address, size_t size, const char* data);  // Write to the write device
+    bool writeToDevice(uint32_t address, size_t size, const std::string& filename);  // Write to the write device
+    void printReadTransferSpeed() const;  // Print transfer speed for reading
+    void printWriteTransferSpeed() const;  // Print transfer speed for writing
+    void printReadHexDump(size_t size) const;  // Print hex dump for reading
+    // Add additional control methods if needed
 
 private:
-    std::string device_;
-    int fd_;
-    std::vector<char> buffer_;
-
-    std::chrono::steady_clock::time_point startTime_, endTime_;
-
-    void openDevice();  // Open the device
-    void closeDevice();  // Close the device
+    XDMADeviceRead readDevice_;
+    XDMADeviceWrite writeDevice_;
+    XDMADeviceControl controlDevice_;
 };
 
 #endif // XDMA_DEVICE_H
