@@ -1,0 +1,8 @@
+/root/playground/PCIe_DMA_Readout/build/CMakeFiles/xdma_device.dir
+/root/playground/PCIe_DMA_Readout/build/CMakeFiles/PCIe_DMA_Readout.dir
+/root/playground/PCIe_DMA_Readout/build/CMakeFiles/edit_cache.dir
+/root/playground/PCIe_DMA_Readout/build/CMakeFiles/rebuild_cache.dir
+/root/playground/PCIe_DMA_Readout/build/CMakeFiles/list_install_components.dir
+/root/playground/PCIe_DMA_Readout/build/CMakeFiles/install.dir
+/root/playground/PCIe_DMA_Readout/build/CMakeFiles/install/local.dir
+/root/playground/PCIe_DMA_Readout/build/CMakeFiles/install/strip.dir

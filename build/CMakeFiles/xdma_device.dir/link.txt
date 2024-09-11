@@ -1,0 +1,2 @@
+/usr/bin/ar qc libxdma_device.a CMakeFiles/xdma_device.dir/source/xdma_device.cpp.o
+/usr/bin/ranlib libxdma_device.a

@@ -1,0 +1,47 @@
+# Ignore binary files and build artifacts
+bin/
+build/
+
+# Ignore deprecated files and folders
+deprecated/
+
+# Ignore library files
+lib/
+
+# Ignore OS-generated files
+.DS_Store
+Thumbs.db
+
+# Ignore IDE-specific files
+.idea/
+.vscode/
+
+# Ignore temporary files
+*.tmp
+*.swp
+
+# Ignore log files
+*.log
+
+# Ignore compiled object files
+*.o
+*.obj
+
+# Ignore static library files
+*.a
+
+# Ignore shared library files
+*.so
+*.dylib
+*.dll
+
+# Ignore executables
+*.out
+*.exe
+
+# Ignore CMake build directory
+CMakeFiles/
+CMakeCache.txt
+cmake_install.cmake
+Makefile
+
