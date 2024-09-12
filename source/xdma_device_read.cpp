@@ -15,28 +15,33 @@ XDMADeviceRead::XDMADeviceRead(const std::string& device)
 
 XDMADeviceRead::~XDMADeviceRead() {}
 
-ssize_t XDMADeviceRead::readFromDevice(uint32_t address, size_t size) {
+std::vector<char> XDMADeviceRead::readFromDevice(uint32_t address, size_t size) {
     if (!isDeviceOpen()) {
         std::cerr << "Device not open\n";
-        return -1;
+        return {}; // Return an empty vector
     }
 
-    buffer_.resize(size);
+    buffer_.resize(size);  // Resize buffer to the desired size
     off_t off = ::lseek(fd_, address, SEEK_SET);
     if (off < 0) {
         std::cerr << "Failed to seek to address: " << std::strerror(errno) << "\n";
-        return -1;
+        return {}; // Return an empty vector
     }
-    std::fill(buffer_.begin(), buffer_.end(), 0x00);
+    std::fill(buffer_.begin(), buffer_.end(), 0x00); // Optionally fill buffer with zeros
+
     startTime_ = std::chrono::steady_clock::now();
     ssize_t bytes = ::read(fd_, buffer_.data(), size);
     endTime_ = std::chrono::steady_clock::now();
+
     if (bytes < 0) {
-        std::cerr << "Error reading device: " << std::strerror(errno) << "\n";
+        std::cerr << "Error reading from device: " << std::strerror(errno) << "\n";
+        return {}; // Return an empty vector
     } else if (bytes < static_cast<ssize_t>(size)) {
         std::cerr << "Short read of " << bytes << " bytes into a " << size << " bytes buffer\n";
+        buffer_.resize(bytes); // Resize buffer to the actual number of bytes read
     }
-    return bytes;
+
+    return buffer_; // Return the buffer with the data read
 }
 
 void XDMADeviceRead::printTransferSpeed() const {

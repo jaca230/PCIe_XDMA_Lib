@@ -11,7 +11,7 @@ public:
     ~XDMADevice();
 
     bool initialize();  // Initialize all devices
-    ssize_t readFromDevice(uint32_t address, size_t size);  // Read from the read device
+    std::vector<char> readFromDevice(uint32_t address, size_t size);  // Read from the read device
     bool writeToDevice(uint32_t address, size_t size, const char* data);  // Write to the write device
     bool writeToDevice(uint32_t address, size_t size, const std::string& filename);  // Write to the write device
     void printReadTransferSpeed() const;  // Print transfer speed for reading

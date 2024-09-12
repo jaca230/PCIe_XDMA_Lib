@@ -10,7 +10,7 @@ public:
     XDMADeviceRead(const std::string& device);
     ~XDMADeviceRead();
 
-    ssize_t readFromDevice(uint32_t address, size_t size);
+    std::vector<char> readFromDevice(uint32_t address, size_t size);
     void printTransferSpeed() const;
     void printHexDump(size_t size) const;
 

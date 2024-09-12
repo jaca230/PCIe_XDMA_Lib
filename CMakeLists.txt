@@ -59,3 +59,9 @@ install(TARGETS PCIe_DMA_Readout
 install(TARGETS xdma_device
     ARCHIVE DESTINATION lib
 )
+
+# Install header files
+install(DIRECTORY include/
+    DESTINATION include
+    FILES_MATCHING PATTERN "*.h"
+)

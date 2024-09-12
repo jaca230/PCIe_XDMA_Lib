@@ -56,6 +56,9 @@ bool XDMADeviceWrite::writeToDevice(uint32_t address, size_t size, const char* d
         std::cerr << "Short write of " << bytes_written << " bytes to device\n";
     }
 
+    // Update buffer size after write operation
+    buffer_.resize(size);
+
     return true;
 }
 

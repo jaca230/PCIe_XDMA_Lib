@@ -15,7 +15,7 @@ bool XDMADevice::initialize() {
     return readInitialized && writeInitialized && controlInitialized;
 }
 
-ssize_t XDMADevice::readFromDevice(uint32_t address, size_t size) {
+std::vector<char> XDMADevice::readFromDevice(uint32_t address, size_t size) {
     return readDevice_.readFromDevice(address, size);
 }
 

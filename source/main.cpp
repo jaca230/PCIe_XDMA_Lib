@@ -42,13 +42,13 @@ int main(int argc, char* argv[]) {
 
     // Read from the device
     start = std::chrono::high_resolution_clock::now();
-    ssize_t bytesRead = xdmaDevice.readFromDevice(address, size);
-    if (bytesRead >= 0) {
+    std::vector<char> buffer = xdmaDevice.readFromDevice(address, size);
+    if (!buffer.empty()) {
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;
-        std::cout << "Read operation successful, " << bytesRead << " bytes read. Time taken: " << elapsed.count() << " seconds.\n";
-        xdmaDevice.printReadHexDump(size);
-        xdmaDevice.printReadTransferSpeed();
+        std::cout << "Read operation successful, " << buffer.size() << " bytes read. Time taken: " << elapsed.count() << " seconds.\n";
+        xdmaDevice.printReadHexDump(buffer.size()); // Update this method to use the buffer
+        xdmaDevice.printReadTransferSpeed();        // Update this method if needed
     } else {
         std::cerr << "Failed to read from the device.\n";
         return EXIT_FAILURE;
