@@ -59,4 +59,4 @@ while [[ "$1" != "" ]]; do
 done
 
 # Call the PCIe_DMA_Readout executable
-"$script_directory/../bin/PCIe_DMA_Readout" "$device_prefix" "$address" "$size" "$channel_index"
+"$script_directory/../bin/PCIe_DMA" "$device_prefix" "$address" "$size" "$channel_index"
