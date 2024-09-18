@@ -9,6 +9,8 @@
 #include <stdexcept>
 #include <cstdlib>
 #include <cassert>
+#include <iomanip>
+
 
 XDMADeviceRead::XDMADeviceRead(const std::string& device)
     : XDMADeviceBase(device) {}
@@ -59,12 +61,22 @@ void XDMADeviceRead::printHexDump(size_t size) const {
         std::cerr << "No data to dump\n";
         return;
     }
+
+    // Ensure the size does not exceed the buffer size
+    size = std::min(size, buffer_.size());
+
     for (size_t i = 0; i < size; i += 16) {
-        std::cout << std::hex << i << ": ";
+        // Print address
+        std::cout << std::hex << std::setw(8) << std::setfill('0') << i << ": ";
+
+        // Print hex values
         for (size_t j = 0; j < 16 && i + j < size; ++j) {
-            std::cout << std::hex << static_cast<unsigned>(buffer_[i + j]) << " ";
+            std::cout << std::hex << std::setw(2) << std::setfill('0')
+                      << static_cast<int>(static_cast<unsigned char>(buffer_[i + j])) << " ";
         }
         std::cout << " |";
+
+        // Print ASCII characters
         for (size_t j = 0; j < 16 && i + j < size; ++j) {
             char c = buffer_[i + j];
             if (c >= 32 && c <= 126) {

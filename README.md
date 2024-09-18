@@ -65,7 +65,7 @@ PCIe_XDMA_Lib is a C++ library for interacting with PCIe DMA devices. This repos
    make install
    ```
 
-   By default, files will be installed to `/usr/local/bin` for executables and `/usr/local/lib` for libraries. You can change this by setting the `CMAKE_INSTALL_PREFIX` variable:
+   By default, files will be installed to `/usr/local/bin` for executable, `/usr/local/lib` for libraries. and `/usr/local/include/` for headers. You can change this by setting the `CMAKE_INSTALL_PREFIX` variable:
 
    ```bash
    cmake -DCMAKE_INSTALL_PREFIX=/your/custom/path ..

@@ -4,25 +4,46 @@
 #include "xdma_device_read.h"
 #include "xdma_device_write.h"
 #include "xdma_device_control.h"
+#include <vector>
+#include <string>
 
 class XDMADevice {
 public:
-    XDMADevice(const std::string& readDevice, const std::string& writeDevice, const std::string& controlDevice);
+    // Constructor takes the device prefix
+    XDMADevice(const std::string& devicePrefix);
+
+    // Destructor
     ~XDMADevice();
 
-    bool initialize();  // Initialize all devices
-    std::vector<char> readFromDevice(uint32_t address, size_t size);  // Read from the read device
-    bool writeToDevice(uint32_t address, size_t size, const char* data);  // Write to the write device
-    bool writeToDevice(uint32_t address, size_t size, const std::string& filename);  // Write to the write device
-    void printReadTransferSpeed() const;  // Print transfer speed for reading
-    void printWriteTransferSpeed() const;  // Print transfer speed for writing
-    void printReadHexDump(size_t size) const;  // Print hex dump for reading
-    // Add additional control methods if needed
+    // Initialize all devices
+    bool initialize();
+
+    // Methods for reading and writing to the device
+    std::vector<char> readFromDevice(uint32_t address, size_t size, int channelIndex);
+    bool writeToDevice(uint32_t address, size_t size, const char* data, int channelIndex);
+    bool writeToDevice(uint32_t address, size_t size, const std::string& filename, int channelIndex);
+
+    // Methods for printing transfer speeds and hex dumps
+    void printReadTransferSpeed(int channelIndex) const;
+    void printWriteTransferSpeed(int channelIndex) const;
+    void printReadHexDump(size_t size, int channelIndex) const;
+
+    // Methods for control device
+    int getH2CChannelCount();
+    int getC2HChannelCount();
+    bool isStreaming() const;
 
 private:
-    XDMADeviceRead readDevice_;
-    XDMADeviceWrite writeDevice_;
+    std::string devicePrefix_;
     XDMADeviceControl controlDevice_;
+    std::vector<XDMADeviceRead> readDevices_;
+    std::vector<XDMADeviceWrite> writeDevices_;
+
+    // Constants
+    static const std::string CONTROL_DEVICE_SUFFIX;
+    static const std::string READ_DEVICE_SUFFIX;
+    static const std::string WRITE_DEVICE_SUFFIX;
+    static const int INVALID_CHANNEL_INDEX;
 };
 
 #endif // XDMA_DEVICE_H

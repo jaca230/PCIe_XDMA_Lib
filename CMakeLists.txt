@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.10)
 
 # Project name
-project(PCIe_DMA_Readout)
+project(PCIe_DMA_read_write_test)
 
 # Specify the C++ standard
 set(CMAKE_CXX_STANDARD 11)
