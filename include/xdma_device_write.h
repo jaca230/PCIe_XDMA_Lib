@@ -11,13 +11,14 @@ public:
     XDMADeviceWrite(const std::string& device);
     ~XDMADeviceWrite();
 
-    bool writeToDevice(uint32_t address, size_t size, const std::string& filename = "");
-    bool writeToDevice(uint32_t address, size_t size, const char* data);
+    bool writeToDevice(uint32_t address, const std::string& filename = "");
+    bool writeToDevice(uint32_t address, const void* data, size_t size);
+    bool writeToDevice(uint32_t address, const std::vector<std::byte>& byteArray);
 
     void printTransferSpeed() const;
 
 private:
-    std::vector<char> buffer_;
+    std::vector<std::byte> buffer_;  // Use std::byte to store raw data
     std::chrono::steady_clock::time_point startTime_, endTime_;
 };
 

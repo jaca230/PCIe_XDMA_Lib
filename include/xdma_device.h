@@ -19,14 +19,15 @@ public:
     bool initialize();
 
     // Methods for reading and writing to the device
-    std::vector<char> readFromDevice(uint32_t address, size_t size, int channelIndex);
-    bool writeToDevice(uint32_t address, size_t size, const char* data, int channelIndex);
-    bool writeToDevice(uint32_t address, size_t size, const std::string& filename, int channelIndex);
+    std::vector<std::byte> readFromDevice(uint32_t address, size_t size, int channelIndex);
+    bool writeToDevice(uint32_t address, const void* data, size_t size, int channelIndex);
+    bool writeToDevice(uint32_t address, const std::string& filename, int channelIndex);
+    bool writeToDevice(uint32_t address, const std::vector<std::byte>& byteArray, int channelIndex);
 
     // Methods for printing transfer speeds and hex dumps
     void printReadTransferSpeed(int channelIndex) const;
     void printWriteTransferSpeed(int channelIndex) const;
-    void printReadHexDump(size_t size, int channelIndex) const;
+    void printReadHexDump(size_t size, int channelIndex, size_t word_size = 1) const;
 
     // Methods for control device
     int getH2CChannelCount();

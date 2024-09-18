@@ -11,34 +11,35 @@ XDMADeviceWrite::XDMADeviceWrite(const std::string& device)
 
 XDMADeviceWrite::~XDMADeviceWrite() {}
 
-bool XDMADeviceWrite::writeToDevice(uint32_t address, size_t size, const std::string& filename) {
-    buffer_.resize(size);
-
-    if (!filename.empty()) {
-        std::ifstream file(filename, std::ios::binary);
-        if (!file) {
-            std::cerr << "Failed to open file: " << std::strerror(errno) << "\n";
-            return false;
-        }
-        file.read(buffer_.data(), size);
-        if (file.gcount() != static_cast<std::streamsize>(size)) {
-            std::cerr << "Failed to read the correct amount of data from file\n";
-            return false;
-        }
-    } else {
-        std::cerr << "No filename provided for write operation.\n";
+bool XDMADeviceWrite::writeToDevice(uint32_t address, const std::string& filename) {
+    // Open the file containing the data to write
+    std::ifstream file(filename, std::ios::binary | std::ios::ate);
+    if (!file.is_open()) {
+        std::cerr << "Failed to open file for reading.\n";
         return false;
     }
 
-    return writeToDevice(address, size, buffer_.data());
+    // Get file size
+    std::streamsize size = file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    // Read the file data into a buffer
+    std::vector<std::byte> buffer(size);
+    if (!file.read(reinterpret_cast<char*>(buffer.data()), size)) {
+        std::cerr << "Failed to read file data.\n";
+        return false;
+    }
+
+    // Write the data to the device
+    return writeToDevice(address, buffer);
 }
 
-bool XDMADeviceWrite::writeToDevice(uint32_t address, size_t size, const char* data) {
+bool XDMADeviceWrite::writeToDevice(uint32_t address, const void* data, size_t size) {
     if (!isDeviceOpen()) {
         std::cerr << "Device not open\n";
         return false;
     }
-
+    
     off_t off = ::lseek(fd_, address, SEEK_SET);
     if (off < 0) {
         std::cerr << "Failed to seek to address: " << std::strerror(errno) << "\n";
@@ -60,6 +61,11 @@ bool XDMADeviceWrite::writeToDevice(uint32_t address, size_t size, const char* d
     buffer_.resize(size);
 
     return true;
+}
+
+// New method for std::vector<std::byte>
+bool XDMADeviceWrite::writeToDevice(uint32_t address, const std::vector<std::byte>& byteArray) {
+    return writeToDevice(address, byteArray.data(), byteArray.size());
 }
 
 void XDMADeviceWrite::printTransferSpeed() const {

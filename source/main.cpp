@@ -3,21 +3,28 @@
 #include <vector>
 #include <chrono>
 #include <cstdlib> // for std::exit
-#include <sstream> // for std::ostringstream>
+#include <sstream> // for std::ostringstream
 #include <iomanip> // For std::setw and std::left
 #include <string>
+#include <cstddef>  // for std::byte
 
 // Helper function to format lines to a fixed width
 std::string formatLine(const std::string& text, size_t value) {
     std::ostringstream oss;
-    oss << text << value;
-    std::string line = oss.str();
-    if (line.size() < 16) {
-        line += std::string(16 - line.size(), ' '); // Add spaces if the line is shorter than 16 characters
-    } else if (line.size() > 16) {
-        line = line.substr(0, 16); // Trim if the line is longer than 16 characters
+    oss << std::left << std::setw(16) << std::setfill(' ') << (text + std::to_string(value));
+    return oss.str();
+}
+
+void printByteBuffer(const std::vector<std::byte>& buffer) {
+    std::cout << "Byte buffer contents:\n";
+    for (std::size_t i = 0; i < buffer.size(); ++i) {
+        std::cout << std::hex << std::setw(2) << std::setfill('0')
+                  << static_cast<int>(buffer[i]) << ' ';
+        if ((i + 1) % 16 == 0) { // Print 16 bytes per line
+            std::cout << '\n';
+        }
     }
-    return line;
+    std::cout << '\n';
 }
 
 int main(int argc, char* argv[]) {
@@ -45,14 +52,10 @@ int main(int argc, char* argv[]) {
 
     // Generate test data
     std::ostringstream oss;
-    oss << " Transfer  test "; // First line
-    oss << "----------------"; // Second line
+    oss << formatLine("Transfer test:", 0); // First line
+    oss << formatLine("Size:", size); // Second line
+    oss << formatLine("Channel:", channelIndex); // Third line
 
-    // Format the lines to be exactly 16 characters wide
-    oss << formatLine("Size: ", size); // Third line
-    oss << formatLine("Channel: ", channelIndex); // Fourth line
-
-    // Fill the remaining space with "*16ByteTestLine*"
     std::string pattern = "16B Example Line";
     std::string filler;
     size_t num_repeats = (size - oss.str().size()) / pattern.size();
@@ -64,12 +67,9 @@ int main(int argc, char* argv[]) {
     // Ensure the message size matches the requested size
     message = message.substr(0, size);
 
-    // Convert the message to a vector of chars
-    std::vector<char> testData(message.begin(), message.end());
-
     // Write to the device
     auto start = std::chrono::high_resolution_clock::now();
-    if (xdmaDevice.writeToDevice(address, size, testData.data(), channelIndex)) {
+    if (xdmaDevice.writeToDevice(address, message.data(), size, channelIndex)) {
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;
         std::cout << "Write operation successful. Time taken: " << elapsed.count() << " seconds.\n";
@@ -81,15 +81,16 @@ int main(int argc, char* argv[]) {
 
     // Read from the device
     start = std::chrono::high_resolution_clock::now();
-    std::vector<char> buffer = xdmaDevice.readFromDevice(address, size, channelIndex);
-    if (!buffer.empty()) {
+    std::vector<std::byte> byteBuffer = xdmaDevice.readFromDevice(address, size, channelIndex);
+    if (!byteBuffer.empty()) {
         auto end = std::chrono::high_resolution_clock::now();
         std::chrono::duration<double> elapsed = end - start;
-        std::cout << "Read operation successful, " << buffer.size() << " bytes read. Time taken: " << elapsed.count() << " seconds.\n";
+        std::cout << "Read operation successful, " << byteBuffer.size() << " bytes read. Time taken: " << elapsed.count() << " seconds.\n";
+
         if (printout) {
-            xdmaDevice.printReadHexDump(buffer.size(), channelIndex); // Update this method to use the buffer
+            xdmaDevice.printReadHexDump(size, channelIndex); // Print hex dump of the read data
         }
-        xdmaDevice.printReadTransferSpeed(channelIndex); // Update this method if needed
+        xdmaDevice.printReadTransferSpeed(channelIndex); // Print read transfer speed
     } else {
         std::cerr << "Failed to read from the device.\n";
         return EXIT_FAILURE;
@@ -98,8 +99,8 @@ int main(int argc, char* argv[]) {
     // Get the number of h2c channels and c2h channels
     int h2cChannels = xdmaDevice.getH2CChannelCount();
     int c2hChannels = xdmaDevice.getC2HChannelCount();
-    std::cout << "Number of enabled h2c channels: " << h2cChannels << "\n";
-    std::cout << "Number of enabled c2h channels: " << c2hChannels << "\n";
+    std::cout << "Number of h2c channels: " << h2cChannels << "\n";
+    std::cout << "Number of c2h channels: " << c2hChannels << "\n";
 
     // Determine if the core is memory-mapped or streaming
     bool isStreaming = xdmaDevice.isStreaming();
